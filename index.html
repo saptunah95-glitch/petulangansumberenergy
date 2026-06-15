@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Petualangan Penyelamat Energi - Kelas 3 SD</title>
+  <!-- Tailwind CSS untuk styling modern -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Fredoka & Nunito untuk font ramah anak -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+    }
+    .font-kids {
+      font-family: 'Fredoka', sans-serif;
+    }
+    /* Animasi mengapung untuk maskot */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(3deg); }
+    }
+    .animate-float {
+      animation: float 4s ease-in-out infinite;
+    }
+    /* Efek berkilau */
+    @keyframes pulse-glow {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.6)); }
+      50% { transform: scale(1.05); filter: drop-shadow(0 0 15px rgba(251, 191, 36, 1)); }
+    }
+    .animate-glow {
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-sky-100 via-teal-50 to-emerald-100 min-h-screen flex flex-col justify-between overflow-x-hidden select-none">
+
+  <!-- Audio Element untuk Musik Latar -->
+  <audio id="bg-music" src="https://github.com/saptunah95-glitch/musik-gimiku/raw/refs/heads/main/Paper_Plane_Parade.mp3" loop></audio>
+
+  <!-- Header / Navigasi -->
+  <header class="w-full max-w-4xl mx-auto p-4 flex justify-between items-center z-10">
+    <div class="flex items-center gap-2">
+      <span class="text-3xl animate-bounce">⚡</span>
+      <h1 class="font-kids text-xl md:text-2xl font-bold text-teal-700 tracking-wide">Penyelamat Energi!</h1>
+    </div>
+    
+    <!-- Kontrol Musik & Papan Skor -->
+    <div class="flex items-center gap-2">
+      <!-- Tombol Pengatur Musik Musik -->
+      <button id="btn-music-toggle" onclick="toggleMusic()" class="bg-white/90 backdrop-blur shadow-md w-10 h-10 rounded-full border-2 border-teal-200 flex items-center justify-center text-xl hover:bg-teal-50 transition transform active:scale-95" title="Nyalakan/Matikan Musik">
+        🔇
+      </button>
+
+      <!-- Papan Skor -->
+      <div class="bg-white/90 backdrop-blur shadow-md px-4 py-1.5 rounded-full border-2 border-teal-200 flex items-center gap-4">
+        <div class="flex items-center gap-1">
+          <span class="text-xl">⭐️</span>
+          <span id="global-score" class="font-bold text-teal-800 text-lg">0</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <span class="text-xl">❤️</span>
+          <span id="global-lives" class="font-bold text-red-500 text-lg">3</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Kontainer Utama Game -->
+  <main class="flex-grow flex items-center justify-center p-4 w-full max-w-4xl mx-auto">
+    <div class="bg-white/95 rounded-3xl shadow-xl border-4 border-teal-400 p-6 w-full min-h-[500px] flex flex-col justify-between relative overflow-hidden">
+      
+      <!-- Latar Hiasan Awan Belakang -->
+      <div class="absolute -top-10 -left-10 text-slate-200/40 text-9xl pointer-events-none">☁️</div>
+      <div class="absolute -bottom-10 -right-10 text-slate-200/40 text-9xl pointer-events-none">☁️</div>
+
+      <!-- ==================== SCREEN 1: START SCREEN ==================== -->
+      <div id="screen-start" class="flex flex-col items-center justify-center text-center gap-6 py-4">
+        <!-- Maskot Karakter -->
+        <div class="relative w-36 h-36 bg-amber-100 rounded-full flex items-center justify-center border-4 border-amber-400 animate-float shadow-lg">
+          <span class="text-7xl">💡</span>
+          <div class="absolute -bottom-1 -right-1 bg-teal-400 text-white rounded-full p-2 border-2 border-white text-xs font-bold shadow">
+            Halo!
+          </div>
+        </div>
+        
+        <h2 class="font-kids text-3xl md:text-4xl lg:text-5xl font-black text-amber-500 leading-tight drop-shadow-sm">
+          Petualangan Penyelamat Energi
+        </h2>
+        <p class="text-slate-600 max-w-md text-base md:text-lg">
+          Hai Teman-teman Kelas 3! Yuk bantu <strong class="text-teal-600">Albi si Bohlam Pintar</strong> menyelamatkan bumi dengan memahami berbagai sumber energi!
+        </p>
+        
+        <!-- Input Nama -->
+        <div class="w-full max-w-xs mt-2">
+          <label for="player-name" class="block text-sm font-bold text-slate-500 mb-1">Tulis Nama Hebatmu:</label>
+          <input type="text" id="player-name" placeholder="Pahlawan Energi" maxlength="15" class="w-full px-4 py-2 border-2 border-teal-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400 text-center font-bold text-teal-800 text-lg">
+        </div>
+
+        <button onclick="startGame()" class="animate-glow mt-4 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-white font-kids text-2xl font-bold py-4 px-10 rounded-2xl shadow-lg border-b-4 border-amber-700 transition transform hover:-translate-y-1">
+          Mulai Petualangan! 🚀
+        </button>
+      </div>
+
+      <!-- ==================== SCREEN 2: GAMEPLAY SCREEN ==================== -->
+      <div id="screen-game" class="hidden flex-col justify-between h-full flex-grow">
+        
+        <!-- Area Info Level & Panduan Karakter -->
+        <div class="mb-4 bg-teal-50 border-2 border-teal-100 rounded-2xl p-3 flex items-start gap-3">
+          <div class="text-3xl p-1 bg-white rounded-full shadow-inner border border-teal-200">💡</div>
+          <div>
+            <h3 id="level-title" class="font-kids text-teal-800 font-bold text-lg">Level 1: Memilah Sumber Energi</h3>
+            <p id="mascot-guide" class="text-sm text-slate-600">Bantu Albi memilah benda-benda di bawah ke tempat yang benar ya!</p>
+          </div>
+        </div>
+
+        <!-- AREA KONTEN LEVEL (Dinamis Diisi JS) -->
+        <div id="level-content-area" class="flex-grow flex flex-col justify-center my-4 min-h-[250px]">
+          <!-- Level 1, 2, atau 3 dimasukkan di sini secara dinamis -->
+        </div>
+
+        <!-- Footer Kontrol Level -->
+        <div class="flex justify-between items-center border-t border-slate-100 pt-4 mt-auto">
+          <span class="text-sm font-semibold text-slate-400">Pahlawan: <span id="player-display-name" class="text-teal-600 font-bold">Pemain</span></span>
+          <div class="flex gap-2">
+            <button id="btn-next-level" onclick="nextLevel()" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white font-kids px-6 py-2.5 rounded-xl font-bold shadow-md transition">
+              Lanjut Level Berikutnya 👉
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SCREEN 3: GAME OVER / WIN SCREEN ==================== -->
+      <div id="screen-result" class="hidden flex-col items-center justify-center text-center gap-6 py-8">
+        <div id="result-trophy" class="text-8xl animate-bounce">🏆</div>
+        <h2 id="result-title" class="font-kids text-3xl md:text-4xl font-bold text-amber-500">Hebat! Kamu Juara Energi!</h2>
+        
+        <div class="bg-teal-50 border-2 border-teal-200 rounded-2xl p-6 max-w-md w-full shadow-inner">
+          <h3 id="result-subtitle" class="font-bold text-xl text-teal-800 mb-2">Sertifikat Pahlawan Energi</h3>
+          <p class="text-slate-600 text-sm mb-4">Diberikan kepada siswa hebat kelas 3 SD:</p>
+          <p id="certificate-name" class="font-kids text-2xl text-teal-600 font-bold underline decoration-wavy decoration-amber-400 mb-4">Nama Pemain</p>
+          
+          <div class="grid grid-cols-2 gap-2 text-left text-sm font-semibold text-slate-600">
+            <div class="bg-white p-2 rounded-lg border border-teal-100">⭐️ Nilai Akhir: <span id="final-score" class="font-bold text-teal-700">100</span></div>
+            <div class="bg-white p-2 rounded-lg border border-teal-100">🎖️ Predikat: <span id="final-badge" class="font-bold text-amber-600">Sangat Hemat!</span></div>
+          </div>
+        </div>
+
+        <p id="result-message" class="text-slate-600 max-w-sm text-sm md:text-base">
+          Terima kasih sudah membantu Albi. Jangan lupa untuk selalu mematikan lampu dan keran air jika tidak dipakai di rumah ya!
+        </p>
+
+        <button onclick="restartGame()" class="bg-teal-500 hover:bg-teal-600 text-white font-kids text-xl font-bold py-3.5 px-8 rounded-2xl shadow-md transition transform hover:-translate-y-0.5">
+          Main Lagi 🔄
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer Info Sekolah -->
+  <footer class="w-full text-center py-4 text-xs font-semibold text-teal-700/60 z-10">
+    Edukasi Energi Kreatif • Kelas 3 SD Tema 6 • Dibuat dengan ❤️ untuk Masa Depan Bumi
+  </footer>
+
+  <!-- Modal Umpan Balik (Benar/Salah) -->
+  <div id="feedback-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity duration-300">
+    <div class="bg-white rounded-3xl border-4 border-amber-400 max-w-xs w-full p-6 text-center shadow-2xl transform scale-95 transition-transform duration-300">
+      <div id="feedback-emoji" class="text-6xl mb-3">🎉</div>
+      <h3 id="feedback-title" class="font-kids text-2xl font-bold text-amber-500 mb-2">Luar Biasa!</h3>
+      <p id="feedback-desc" class="text-slate-600 text-sm mb-4">Kamu berhasil menjawab dengan benar!</p>
+      <button onclick="closeFeedback()" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-kids py-2 rounded-xl font-bold shadow transition">
+        Lanjut! 👍
+      </button>
+    </div>
+  </div>
+
+  <!-- SCRIPT LOGIKA UTAMA GAME -->
+  <script>
+    // --- AUDIO GENERATOR (Web Audio API) ---
+    // Mematikan ketergantungan file musik dari internet, membuat suara sendiri lewat browser!
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (!audioCtx) return;
+      
+      // Mengaktifkan kembali audio context jika ter-suspend karena kebijakan browser
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      if (type === 'correct') {
+        // Nada ting tinggi (sukses)
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } else if (type === 'wrong') {
+        // Nada buzz rendah (salah)
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.25);
+        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } else if (type === 'victory') {
+        // Melodi kemenangan singkat
+        const notes = [261.63, 329.63, 392.00, 523.25]; // C4, E4, G4, C5
+        notes.forEach((freq, index) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.type = 'triangle';
+          o.frequency.setValueAtTime(freq, audioCtx.currentTime + index * 0.12);
+          g.gain.setValueAtTime(0.2, audioCtx.currentTime + index * 0.12);
+          g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + index * 0.12 + 0.2);
+          o.start(audioCtx.currentTime + index * 0.12);
+          o.stop(audioCtx.currentTime + index * 0.12 + 0.2);
+        });
+      } else if (type === 'click') {
+        // Suara klik tombol standar
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+      }
+    }
+
+    // --- KONTROL MUSIK LATAR (BACKGROUND MUSIC) ---
+    const bgMusic = document.getElementById('bg-music');
+    let isMusicMuted = true; // Default awal mati sebelum ada interaksi untuk kepatuhan browser
+
+    function toggleMusic() {
+      const btn = document.getElementById('btn-music-toggle');
+      if (bgMusic.paused) {
+        bgMusic.play()
+          .then(() => {
+            isMusicMuted = false;
+            btn.textContent = '🎵';
+            btn.classList.add('animate-pulse');
+          })
+          .catch(err => console.log("Gagal memutar musik:", err));
+      } else {
+        bgMusic.pause();
+        isMusicMuted = true;
+        btn.textContent = '🔇';
+        btn.classList.remove('animate-pulse');
+      }
+    }
+
+    // --- STATE UTAMA GAME ---
+    let playerName = "Pahlawan Energi";
+    let currentLevel = 1;
+    let score = 0;
+    let lives = 3;
+    let feedbackCallback = null;
+
+    // --- DATA SOAL-SOAL ---
+    // Level 1: Pengelompokan Sumber Energi
+    const level1Data = {
+      instructions: "Kelompokkan benda-benda berikut! Klik tombol di bawah benda untuk memasukkannya ke kelompok yang benar.",
+      items: [
+        { id: 'l1-1', name: "Matahari", emoji: "☀️", category: "renewable", desc: "Sinar matahari tidak akan pernah habis!" },
+        { id: 'l1-2', name: "Batu Bara", emoji: "🪨", category: "non-renewable", desc: "Batu bara terbentuk jutaan tahun dan bisa habis." },
+        { id: 'l1-3', name: "Angin (Udara)", emoji: "💨", category: "renewable", desc: "Udara bergerak selalu ada di sekitar kita." },
+        { id: 'l1-4', name: "Minyak Bumi", emoji: "🛢️", category: "non-renewable", desc: "Bensin/Solar dibuat dari minyak bumi yang terbatas." },
+        { id: 'l1-5', name: "Aliran Air", emoji: "💧", category: "renewable", desc: "Siklus air membuatnya dapat terus dimanfaatkan." },
+        { id: 'l1-6', name: "Gas Alam", emoji: "🔥", category: "non-renewable", desc: "Gas alam untuk memasak di tabung elpiji bisa habis." }
+      ],
+      categories: {
+        renewable: "Bisa Diperbarui (Selalu Ada)",
+        'non-renewable': "Bisa Habis (Terbatas)"
+      }
+    };
+
+    // Level 2: Perubahan Bentuk Energi (Tema 6 Kurikulum SD)
+    const level2Data = {
+      instructions: "Tebak perubahan energi pada benda sehari-hari berikut ini!",
+      questions: [
+        {
+          id: 'l2-1',
+          name: "Kipas Angin listrik",
+          emoji: "🌀",
+          options: [
+            { text: "Energi Listrik ➔ Energi Panas", correct: false },
+            { text: "Energi Listrik ➔ Energi Gerak", correct: true },
+            { text: "Energi Gerak ➔ Energi Bunyi", correct: false }
+          ],
+          reason: "Kipas angin mengubah aliran listrik menjadi gerakan baling-baling agar udara sejuk."
+        },
+        {
+          id: 'l2-2',
+          name: "Setrika Baju",
+          emoji: "🔌",
+          options: [
+            { text: "Energi Listrik ➔ Energi Panas", correct: true },
+            { text: "Energi Listrik ➔ Energi Cahaya", correct: false },
+            { text: "Energi Kimia ➔ Energi Listrik", correct: false }
+          ],
+          reason: "Setrika menggunakan energi listrik untuk menghasilkan panas agar baju rapi."
+        },
+        {
+          id: 'l2-3',
+          name: "Radio yang berbunyi",
+          emoji: "📻",
+          options: [
+            { text: "Energi Listrik ➔ Energi Gerak", correct: false },
+            { text: "Energi Cahaya ➔ Energi Kimia", correct: false },
+            { text: "Energi Listrik ➔ Energi Bunyi", correct: true }
+          ],
+          reason: "Radio mengubah energi listrik (atau baterai) menjadi suara musik/berita."
+        },
+        {
+          id: 'l2-4',
+          name: "Lampu Senter (dengan Baterai)",
+          emoji: "🔦",
+          options: [
+            { text: "Energi Kimia ➔ Energi Cahaya", correct: true },
+            { text: "Energi Listrik ➔ Energi Gerak", correct: false },
+            { text: "Energi Panas ➔ Energi Cahaya", correct: false }
+          ],
+          reason: "Baterai menyimpan energi kimia yang diubah senter menjadi cahaya yang terang."
+        }
+      ]
+    };
+
+    // Level 3: Perilaku Hemat Energi (Trivia Kasus)
+    const level3Data = {
+      instructions: "Pilihlah tindakan terbaik untuk menghemat energi di sekitarmu!",
+      questions: [
+        {
+          scenario: "Hari sudah siang dan kamarmu sangat terang karena sinar matahari masuk melalui jendela. Namun, lampu kamar masih menyala.",
+          options: [
+            { text: "Biarkan saja menyala agar kamarmu semakin super terang.", correct: false, comment: "Duh, menyalakan lampu di siang bolong itu boros energi listrik lho!" },
+            { text: "Matikan lampu kamar dan nikmati terang alami dari matahari.", correct: true, comment: "Hebat! Sinar matahari adalah penerang alami terbaik di siang hari." }
+          ]
+        },
+        {
+          scenario: "Kamu sudah selesai mandi, tetapi air di dalam bak mandi meluap dan keran air masih mengalir deras.",
+          options: [
+            { text: "Segera tutup keran air dengan rapat agar air bersih tidak terbuang sia-sia.", correct: true, comment: "Benar sekali! Air bersih adalah energi kehidupan yang harus dijaga." },
+            { text: "Biarkan saja air meluap, bermain air banjir di lantai kamar mandi seru!", correct: false, comment: "Aduh, itu membuang-buang air bersih dan pompa air bekerja boros listrik!" }
+          ]
+        },
+        {
+          scenario: "Kamu ingin pergi bermain ke rumah temanmu yang letaknya sangat dekat (hanya berjarak 3 rumah dari rumahmu).",
+          options: [
+            { text: "Minta diantar naik motor oleh Ayah atau Ibu agar cepat sampai.", correct: false, comment: "Naik motor untuk jarak sangat dekat membuang bensin (energi fosil) dan bikin polusi!" },
+            { text: "Berjalan kaki atau naik sepeda santai bersama teman.", correct: true, comment: "Keren! Jalan kaki itu sehat dan sama sekali tidak menghabiskan bahan bakar minyak." }
+          ]
+        }
+      ]
+    };
+
+    // --- INISIALISASI GAME ---
+    function startGame() {
+      playSound('click');
+      const nameInput = document.getElementById('player-name').value.trim();
+      playerName = nameInput !== "" ? nameInput : "Pahlawan Cilik";
+      
+      document.getElementById('player-display-name').textContent = playerName;
+      document.getElementById('certificate-name').textContent = playerName;
+      
+      // Reset State
+      currentLevel = 1;
+      score = 0;
+      lives = 3;
+      updateScoreboard();
+
+      // Pindah Screen
+      document.getElementById('screen-start').classList.add('hidden');
+      document.getElementById('screen-game').classList.remove('hidden');
+
+      // Mainkan musik otomatis pada klik "Mulai Petualangan"
+      bgMusic.volume = 0.35; // Volume nyaman
+      bgMusic.play()
+        .then(() => {
+          isMusicMuted = false;
+          const btn = document.getElementById('btn-music-toggle');
+          btn.textContent = '🎵';
+          btn.classList.add('animate-pulse');
+        })
+        .catch(err => {
+          console.log("Autoplay musik terhambat, klik tombol speaker di atas untuk menghidupkan musik.");
+        });
+
+      loadLevel();
+    }
+
+    function updateScoreboard() {
+      document.getElementById('global-score').textContent = score;
+      document.getElementById('global-lives').textContent = lives;
+    }
+
+    // --- MEKANISME ROUTER LEVEL ---
+    function loadLevel() {
+      const contentArea = document.getElementById('level-content-area');
+      const levelTitle = document.getElementById('level-title');
+      const mascotGuide = document.getElementById('mascot-guide');
+      const nextBtn = document.getElementById('btn-next-level');
+
+      nextBtn.classList.add('hidden'); // Sembunyikan tombol lanjut sampai tantangan beres
+
+      if (currentLevel === 1) {
+        levelTitle.textContent = "Level 1: Menentukan Sumber Energi";
+        mascotGuide.textContent = level1Data.instructions;
+        setupLevel1(contentArea);
+      } else if (currentLevel === 2) {
+        levelTitle.textContent = "Level 2: Perubahan Bentuk Energi";
+        mascotGuide.textContent = level2Data.instructions;
+        setupLevel2(contentArea);
+      } else if (currentLevel === 3) {
+        levelTitle.textContent = "Level 3: Misi Menyelamatkan Energi";
+        mascotGuide.textContent = level3Data.instructions;
+        setupLevel3(contentArea);
+      } else {
+        showFinalResult();
+      }
+    }
+
+    // --- LEVEL 1 SETUP: MEMILAH SUMBER ENERGI ---
+    let level1ItemsLeft = [];
+    function setupLevel1(container) {
+      level1ItemsLeft = [...level1Data.items];
+      
+      container.innerHTML = `
+        <div class="flex flex-col items-center gap-6 w-full">
+          <!-- Item yang akan disortir (Ditampilkan satu per satu agar mudah di HP) -->
+          <div id="l1-card-container" class="w-full flex justify-center min-h-[160px]">
+            <!-- JS akan memasukkan kartu di sini -->
+          </div>
+
+          <!-- Dua Box Wadah Pengelompokan -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
+            <!-- Box Wadah Renewable -->
+            <button onclick="sortItem('renewable')" class="group p-4 bg-emerald-50 hover:bg-emerald-100/80 border-2 border-dashed border-emerald-400 rounded-2xl flex flex-col items-center justify-center gap-2 transition duration-200 transform active:scale-95">
+              <span class="text-4xl group-hover:scale-110 transition-transform">🔄♻️</span>
+              <span class="font-kids font-bold text-emerald-800 text-sm md:text-base">${level1Data.categories['renewable']}</span>
+              <span class="text-xs text-emerald-600/80">Alamiah & tidak akan habis</span>
+              <div id="l1-bin-renewable" class="flex flex-wrap gap-1 justify-center mt-2 min-h-[24px]"></div>
+            </button>
+            
+            <!-- Box Wadah Non-Renewable -->
+            <button onclick="sortItem('non-renewable')" class="group p-4 bg-rose-50 hover:bg-rose-100/80 border-2 border-dashed border-rose-400 rounded-2xl flex flex-col items-center justify-center gap-2 transition duration-200 transform active:scale-95">
+              <span class="text-4xl group-hover:scale-110 transition-transform">🛢️⚠️</span>
+              <span class="font-kids font-bold text-rose-800 text-sm md:text-base">${level1Data.categories['non-renewable']}</span>
+              <span class="text-xs text-rose-600/80">Jumlahnya terbatas & polusi</span>
+              <div id="l1-bin-non-renewable" class="flex flex-wrap gap-1 justify-center mt-2 min-h-[24px]"></div>
+            </button>
+          </div>
+        </div>
+      `;
+
+      showNextL1Card();
+    }
+
+    function showNextL1Card() {
+      const cardContainer = document.getElementById('l1-card-container');
+      
+      if (level1ItemsLeft.length === 0) {
+        cardContainer.innerHTML = `
+          <div class="bg-emerald-100 border-2 border-emerald-400 rounded-2xl p-6 text-center max-w-sm animate-bounce">
+            <span class="text-5xl">🎉</span>
+            <h4 class="font-kids text-xl font-bold text-emerald-800 mt-2">Hebat Sekali!</h4>
+            <p class="text-slate-600 text-sm">Semua energi terkategori sempurna!</p>
+          </div>
+        `;
+        document.getElementById('btn-next-level').classList.remove('hidden');
+        return;
+      }
+
+      const item = level1ItemsLeft[0];
+      cardContainer.innerHTML = `
+        <div class="bg-gradient-to-br from-amber-50 to-orange-50 border-4 border-amber-300 rounded-2xl p-4 shadow-md flex flex-col items-center justify-center gap-1 w-full max-w-xs animate-float">
+          <span class="text-6xl">${item.emoji}</span>
+          <h4 class="font-kids text-2xl font-bold text-amber-800">${item.name}</h4>
+          <p class="text-xs text-slate-500">Klik salah satu wadah hijau/merah di bawah!</p>
+        </div>
+      `;
+    }
+
+    function sortItem(categoryPicked) {
+      if (level1ItemsLeft.length === 0) return;
+      
+      const item = level1ItemsLeft[0];
+      
+      if (item.category === categoryPicked) {
+        // Benar!
+        score += 10;
+        updateScoreboard();
+        playSound('correct');
+
+        // Menambahkan ikon kecil ke wadah sebagai tanda sukses
+        const binId = categoryPicked === 'renewable' ? 'l1-bin-renewable' : 'l1-bin-non-renewable';
+        const bin = document.getElementById(binId);
+        const iconTag = document.createElement('span');
+        iconTag.className = "text-xl bg-white px-1.5 py-0.5 rounded shadow-sm border border-slate-100 animate-bounce";
+        iconTag.textContent = item.emoji;
+        bin.appendChild(iconTag);
+
+        showFeedback("Benar! 🎉", `${item.name} masuk kelompok ${level1Data.categories[item.category]}. ${item.desc}`, "😀", () => {
+          level1ItemsLeft.shift();
+          showNextL1Card();
+        });
+      } else {
+        // Salah
+        decreaseLife();
+        playSound('wrong');
+        showFeedback("Kurang Tepat! 😢", `Ayo coba ingat lagi, ${item.name} itu ${item.desc}`, "🤔", () => {
+          // Tetap di item yang sama agar anak belajar mengoreksi jawabannya
+        });
+      }
+    }
+
+
+    // --- LEVEL 2 SETUP: TEBAK PERUBAHAN ENERGI ---
+    let l2CurrentIndex = 0;
+    function setupLevel2(container) {
+      l2CurrentIndex = 0;
+      renderL2Question(container);
+    }
+
+    function renderL2Question(container) {
+      if (l2CurrentIndex >= level2Data.questions.length) {
+        container.innerHTML = `
+          <div class="flex flex-col items-center justify-center text-center py-6">
+            <div class="bg-emerald-100 border-2 border-emerald-400 rounded-2xl p-6 max-w-sm animate-bounce">
+              <span class="text-5xl">🌟</span>
+              <h4 class="font-kids text-xl font-bold text-emerald-800 mt-2">Luar Biasa Tangkas!</h4>
+              <p class="text-slate-600 text-sm">Semua perubahan energi tertebak dengan baik.</p>
+            </div>
+          </div>
+        `;
+        document.getElementById('btn-next-level').classList.remove('hidden');
+        return;
+      }
+
+      const q = level2Data.questions[l2CurrentIndex];
+      
+      // Mengacak pilihan jawaban agar dinamis
+      const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+
+      container.innerHTML = `
+        <div class="flex flex-col items-center gap-6 w-full max-w-md mx-auto">
+          <!-- Visual Benda -->
+          <div class="flex items-center gap-4 bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 w-full shadow-sm">
+            <span class="text-6xl p-2 bg-white rounded-xl shadow-inner">${q.emoji}</span>
+            <div class="text-left">
+              <span class="text-xs font-bold text-amber-500 uppercase tracking-widest">Benda ${l2CurrentIndex + 1}/${level2Data.questions.length}</span>
+              <h4 class="font-kids text-2xl font-bold text-teal-800">${q.name}</h4>
+            </div>
+          </div>
+
+          <p class="text-sm font-semibold text-slate-500 text-center">Benda di atas mengubah energi apa menjadi apa ya?</p>
+
+          <!-- Pilihan Jawaban -->
+          <div class="flex flex-col gap-3 w-full">
+            ${shuffledOptions.map((opt, idx) => `
+              <button onclick="checkL2Answer(${opt.correct}, '${q.reason.replace(/'/g, "\\'")}')" class="w-full text-left bg-white hover:bg-teal-50 border-2 border-teal-200 hover:border-teal-400 rounded-xl p-4 font-bold text-teal-900 transition flex items-center justify-between shadow-sm transform active:scale-[0.98]">
+                <span>${opt.text}</span>
+                <span class="text-teal-300">⚡</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function checkL2Answer(isCorrect, explanation) {
+      if (isCorrect) {
+        score += 15;
+        updateScoreboard();
+        playSound('correct');
+        showFeedback("Hebat! Betul Sekali! 🌈", explanation, "🧠", () => {
+          l2CurrentIndex++;
+          renderL2Question(document.getElementById('level-content-area'));
+        });
+      } else {
+        decreaseLife();
+        playSound('wrong');
+        showFeedback("Hampir Benar! 💡", "Coba dipikirkan lagi ya, aliran energinya belum pas.", "🧐", null);
+      }
+    }
+
+
+    // --- LEVEL 3 SETUP: PILIHAN HEMAT ENERGI ---
+    let l3CurrentIndex = 0;
+    function setupLevel3(container) {
+      l3CurrentIndex = 0;
+      renderL3Question(container);
+    }
+
+    function renderL3Question(container) {
+      if (l3CurrentIndex >= level3Data.questions.length) {
+        container.innerHTML = `
+          <div class="flex flex-col items-center justify-center text-center py-6">
+            <div class="bg-emerald-100 border-2 border-emerald-400 rounded-2xl p-6 max-w-sm animate-bounce">
+              <span class="text-5xl">👑</span>
+              <h4 class="font-kids text-xl font-bold text-emerald-800 mt-2">Misi Selesai!</h4>
+              <p class="text-slate-600 text-sm">Kamu resmi menjadi Pahlawan Penyelamat Energi!</p>
+            </div>
+          </div>
+        `;
+        document.getElementById('btn-next-level').classList.remove('hidden');
+        return;
+      }
+
+      const q = level3Data.questions[l3CurrentIndex];
+
+      container.innerHTML = `
+        <div class="flex flex-col items-center gap-6 w-full max-w-xl mx-auto">
+          <!-- Skenario Masalah -->
+          <div class="bg-sky-50 border-2 border-sky-200 rounded-2xl p-4 shadow-sm w-full relative">
+            <span class="absolute -top-3 -right-3 text-2xl">🚨</span>
+            <p class="text-xs font-bold text-sky-500 uppercase tracking-widest mb-1">Misi Hemat ${l3CurrentIndex + 1}/${level3Data.questions.length}</p>
+            <p class="text-slate-700 font-medium text-sm md:text-base leading-relaxed">"${q.scenario}"</p>
+          </div>
+
+          <p class="text-sm font-semibold text-amber-500">Tindakan penyelamatan apa yang akan kamu lakukan?</p>
+
+          <!-- Pilihan Tindakan -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+            ${q.options.map(opt => `
+              <button onclick="checkL3Answer(${opt.correct}, '${opt.comment.replace(/'/g, "\\'")}')" class="bg-white hover:bg-emerald-50 border-2 border-emerald-100 hover:border-emerald-400 rounded-2xl p-4 text-center font-bold text-slate-700 transition flex flex-col items-center justify-center gap-2 shadow hover:shadow-md h-full transform active:scale-95">
+                <span class="text-3xl">${opt.correct ? '✅' : '❌'}</span>
+                <span class="text-xs md:text-sm text-teal-900 leading-tight">${opt.text}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function checkL3Answer(isCorrect, comment) {
+      if (isCorrect) {
+        score += 20;
+        updateScoreboard();
+        playSound('correct');
+        showFeedback("Tindakan Sempurna! 🌱", comment, "🌟", () => {
+          l3CurrentIndex++;
+          renderL3Question(document.getElementById('level-content-area'));
+        });
+      } else {
+        decreaseLife();
+        playSound('wrong');
+        showFeedback("Waduh, Sayang Sekali! 💔", comment, "😢", null);
+      }
+    }
+
+
+    // --- ALUR LEVEL DAN GAMEPLAY CONTROLS ---
+    function nextLevel() {
+      playSound('click');
+      currentLevel++;
+      loadLevel();
+    }
+
+    function decreaseLife() {
+      lives--;
+      updateScoreboard();
+      if (lives <= 0) {
+        showFinalResult(true); // Game Over karena nyawa habis
+      }
+    }
+
+    // --- POPUP MODAL FEEDBACK ---
+    function showFeedback(title, desc, emoji, callback) {
+      document.getElementById('feedback-title').textContent = title;
+      document.getElementById('feedback-desc').textContent = desc;
+      document.getElementById('feedback-emoji').textContent = emoji;
+      
+      const modal = document.getElementById('feedback-modal');
+      modal.classList.remove('hidden');
+      
+      // Simpan callback untuk dijalankan saat tombol "Lanjut" ditekan
+      feedbackCallback = callback;
+    }
+
+    // Fungsi menutup modal
+    function closeFeedback() {
+      playSound('click');
+      document.getElementById('feedback-modal').classList.add('hidden');
+      if (feedbackCallback) {
+        feedbackCallback();
+        feedbackCallback = null;
+      }
+    }
+
+    // --- LAYAR HASIL AKHIR ---
+    function showFinalResult(isGameOver = false) {
+      document.getElementById('screen-game').classList.add('hidden');
+      const screenResult = document.getElementById('screen-result');
+      screenResult.classList.remove('hidden');
+
+      const trophy = document.getElementById('result-trophy');
+      const title = document.getElementById('result-title');
+      const badge = document.getElementById('final-badge');
+      const finalScoreEl = document.getElementById('final-score');
+      const msg = document.getElementById('result-message');
+
+      finalScoreEl.textContent = score;
+
+      if (isGameOver) {
+        playSound('wrong');
+        trophy.textContent = "🔋";
+        title.textContent = "Kehabisan Energi!";
+        title.className = "font-kids text-3xl md:text-4xl font-bold text-red-500";
+        badge.textContent = "Butuh Belajar Lagi";
+        badge.className = "font-bold text-red-600";
+        msg.textContent = `Aduh, energi petualanganmu habis, ${playerName}! Yuk kita baca-baca lagi tentang materi energi di sekitarmu, lalu kita coba main lagi ya! Jangan menyerah!`;
+      } else {
+        playSound('victory');
+        trophy.textContent = "🏆";
+        title.textContent = "Hebat! Kamu Juara Energi!";
+        title.className = "font-kids text-3xl md:text-4xl font-bold text-amber-500 animate-bounce";
+        
+        // Klasifikasi medali berdasarkan nilai
+        if (score >= 150) {
+          badge.textContent = "Pahlawan Energi Teladan (Sempurna)";
+          badge.className = "font-bold text-emerald-600";
+        } else if (score >= 100) {
+          badge.textContent = "Pembela Energi Hebat";
+          badge.className = "font-bold text-blue-600";
+        } else {
+          badge.textContent = "Sahabat Peduli Energi";
+          badge.className = "font-bold text-amber-600";
+        }
+        msg.textContent = `Selamat ya, ${playerName}! Kamu berhasil menyelesaikan semua misi tantangan penyelamatan bumi. Sebarkan kebiasaan menghemat energi ini ke teman-teman di sekolah dan keluarga di rumah!`;
+      }
+    }
+
+    function restartGame() {
+      playSound('click');
+      document.getElementById('screen-result').classList.add('hidden');
+      document.getElementById('screen-start').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
